@@ -2,17 +2,29 @@
 
 namespace lib\elementary;
 
+/**
+ * Class CResponse
+ * @package lib\elementary
+ *
+ * Description - This class we use everywhere to return result and know is returned result valid, or
+ * maybe there are we have any exception, as it, every class and method return this object and everywhere
+ * if in object responseStatus is false, it's mean, that there is some error and it's error we can find in
+ * assertion, elsewhere any value in data is valid returned value
+ */
 class CResponse{
+    const TYPE_OBJECT = "object";
+
     public $responseStatus = false;
-    public $data           = [];
+    public $data           = null;
     public $assertion      = [];
 
     /**
      * CResponse constructor.
-     * @param array $data
+     * @param null $data
      */
-    function __construct(array $data = []){
+    function __construct($data = null){
         $this->data = $data;
+        if($data)$this->setResponseStatus(true);
     }
 
     /**
@@ -32,7 +44,7 @@ class CResponse{
     }
 
     /**
-     * @return array
+     * @return null
      */
     public function getData()
     {
@@ -40,10 +52,11 @@ class CResponse{
     }
 
     /**
-     * @param array[] $data
+     * @param null $data
      */
-    public function setData(array $data = [])
+    public function setData($data = null)
     {
+        $this->setResponseStatus(1);
         $this->data = $data;
     }
 
@@ -63,6 +76,9 @@ class CResponse{
         $this->assertion = $assertion;
     }
 
+    /**
+     * @return array
+     */
     public function __array(){
         return [
             'status' => $this->getResponseStatus(),
@@ -71,9 +87,20 @@ class CResponse{
         ];
     }
 
+    /**
+     * @return string
+     */
     public function toJSON(){
         return json_encode($this->__array());
     }
 
-
+    /**
+     * @return string
+     */
+    public function dataType(){
+        $type = gettype($this->data);
+        if($type === CResponse::TYPE_OBJECT)
+            return get_class($this->data);
+        return $type;
+    }
 }
