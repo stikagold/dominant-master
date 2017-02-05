@@ -1,12 +1,23 @@
 <?php
 
 namespace Dominant\Managers;
+use Dominant\Elementary\UrlParser;
 
-class UrlManager extends DominantManager{
+/**
+ * Class UrlManager
+ * @package Dominant\Managers
+ */
+class UrlManager extends DominantManager
+{
+    /** @var null | UrlParser */
+    private $currentURL = null;
 
-
-    public function someFunction(){
-        echo "Hello from any singleton<br>";
+    /**
+     * @return \Dominant\Elementary\UrlParser
+     */
+    public function getCurrentURL(): UrlParser
+    {
+        return new UrlParser();
     }
 
     /**
@@ -15,5 +26,19 @@ class UrlManager extends DominantManager{
     public static function getInstance()
     {
         return parent::getInstance(__CLASS__);
+    }
+
+    /**
+     * This function doing first step initialisation of manager,like settings, environment and etc
+     *
+     * @param array|null $params
+     *
+     * @return bool
+     */
+    public function initial( array $params = null ): bool
+    {
+        $this->currentURL = new UrlParser();
+
+        return true;
     }
 }

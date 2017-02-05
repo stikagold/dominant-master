@@ -3,13 +3,13 @@
 namespace Dominant\Elementary;
 
 use Dominant\Interfaces\JsonIntegrated;
+use exceptions\invalidArgumentException;
 use exceptions\notImplementedException;
-use Dominant\Elementary\ProtocolBase;
 
 class UrlParser implements JsonIntegrated
 {
-    protected $sourceURL = "";
-    protected $controllers = [];
+    protected $sourceURL    = "";
+    protected $controllers  = [];
     protected $getArguments = [];
 
     /** @var null|ProtocolBase $currentProtocol */
@@ -17,24 +17,97 @@ class UrlParser implements JsonIntegrated
 
     protected $currentDomain = "";
 
-    public function __construct(string $url="")
+    public function __construct( string $url = "" )
     {
+        if (empty($url)) {
+            $this->InitialYourself();
+        } else {
+            throw new notImplementedException("This logic line does not ready to realise",
+                                              notImplementedException::UNIMPLEMENTED_LOGIC);
+        }
     }
 
-    private function parseURL()
+    private function InitialYourself()
     {
-
+        $this->currentProtocol = new ProtocolBase($_SERVER[ 'REQUEST_SCHEME' ]);
+        $this->currentDomain = $_SERVER[ 'SERVER_NAME' ];
+        $details = $_REQUEST;
+        if (!empty($details)) {
+            if (!empty($details[ 'query' ])) {
+                $this->controllers = explode('/', $details[ 'query' ]);
+                unset($details[ 'query' ]);
+            }
+            if (!empty($details)) {
+                $this->getArguments = $details;
+            }
+        }
     }
 
     public function getAsJSON(): string
     {
-        // TODO: Implement getAsJSON() method.
-        throw new notImplementedException("This method is not implemented", notImplementedException::UNIMPLEMENTED_METHOD);
+        return json_encode($this->getAsArray());
     }
 
     public function getAsArray(): array
     {
-        // TODO: Implement getAsArray() method.
-        throw new notImplementedException("This method is not implemented", notImplementedException::UNIMPLEMENTED_METHOD);
+        return [
+            "protocol"    => $this->currentProtocol->getProtocol(),
+            "domain"      => $this->currentDomain,
+            "controllers" => $this->controllers,
+            "arguments"   => $this->getArguments,
+        ];
     }
+
+    public function __toString()
+    {
+        $ret = "";
+        $ret .= $this->currentProtocol->__toString();
+        $ret .= $this->currentDomain.'/';
+        $ret .= implode('/', $this->controllers);
+        $ret .= "?";
+        foreach ($this->getArguments as $command => $value) {
+            $ret .= $command."=".$value."&";
+        }
+        $ret = mb_substr($ret, 0, -1);
+
+        return $ret;
+    }
+
+    /**
+     * @param array $params
+     *
+     * @return bool
+     * @throws \exceptions\invalidArgumentException
+     */
+    public function initialFromArray( array $params ): bool
+    {
+        if (!empty($params)) {
+
+            if (!empty($params[ 'protocol' ]) && is_string($params[ 'protocol' ])) {
+                if (!$this->currentProtocol->setProtocol($params[ 'protocol' ])) {
+                    throw new invalidArgumentException("Unknown protocol {$params['protocol']}");
+                }
+            }
+
+            if (!empty($params[ 'domain' ]) && is_string($params[ 'domain' ])) {
+                $this->currentDomain = $params[ 'domain' ];
+            } else {
+                throw new invalidArgumentException("Missing argument domain name");
+            }
+
+            if (!empty($params[ 'controllers' ]) && is_array($params[ 'controllers' ])) {
+                $this->controllers = $params[ 'controllers' ];
+            }
+
+            if (!empty($params[ 'arguments' ]) && is_array($params[ 'arguments' ])) {
+                $this->getArguments = $params[ 'arguments' ];
+            }
+
+            return true;
+
+        }
+
+        return false;
+    }
+
 }

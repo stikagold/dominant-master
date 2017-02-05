@@ -8,18 +8,22 @@ use exceptions\dominantException;
 
 /**
  * @param $className
+ *
  * @throws dominantException
  */
-function dominantAutoload($className){
+function dominantAutoload( $className )
+{
     $valid_url = LIB_DIR.str_replace('\\', '/', $className);
 
-    if(file_exists($valid_url.".class.php")){
-        require_once($valid_url.".class.php");
+    if (file_exists($valid_url.".class.php")) {
+        require_once( $valid_url.".class.php" );
+
         return;
     }
 
-    if(file_exists($valid_url.".interface.php")){
-        require_once($valid_url.".interface.php");
+    if (file_exists($valid_url.".interface.php")) {
+        require_once( $valid_url.".interface.php" );
+
         return;
     }
 
