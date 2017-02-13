@@ -9,26 +9,22 @@ use Dominant\Elementary\UrlParser;
 
 try {
     echo "<pre>";
-//    $parser = new UrlParser();
-//    var_dump($parser->getAsArray());
-    $caprice = [
-        'protocol'=>\Dominant\Elementary\ProtocolBase::PROTOCOL_HTTP,
-        'domain'=>'caprice.ru',
-        'controllers'=>[
-            'admin',
-            'show_tasks'
-        ],
-        'arguments'=>[
-            'gamer'=>100,
-            'level'=>3
-        ]
-    ];
-//    $parser->initialFromArray($caprice);
-//    echo $parser, "<hr>";
-//    echo $parser->getAsJSON();
-    $urlManager = \Dominant\Managers\UrlManager::getInstance();
-    $currentURL = $urlManager->getCurrentURL();
-    var_dump($currentURL->getAsArray());
+    $url = new UrlParser();
+    $controller = $url->getCoreController();
+    if($controller->status){
+        switch ($controller->responseData) {
+            case "account":
+                require_once(PACKAGES_DIR."index.php");
+                break;
+            default:
+                echo "No defined anything";
+                break;
+        }
+    }
+    $db = new MysqliDb("localhost", "root", "Gizma85451605", "mykruto_ru");
+    $admins = $db->get("adm_users");
+    var_dump($admins);
+//    var_dump($controller->getAsArray());
 }catch (dominantException $e){
     echo "Catched error<br>", $e->getMessage();
 }

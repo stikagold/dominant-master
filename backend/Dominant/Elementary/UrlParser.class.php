@@ -4,6 +4,7 @@ namespace Dominant\Elementary;
 
 use Dominant\Interfaces\JsonIntegrated;
 use exceptions\invalidArgumentException;
+use exceptions\notFountException;
 use exceptions\notImplementedException;
 
 class UrlParser implements JsonIntegrated
@@ -108,6 +109,28 @@ class UrlParser implements JsonIntegrated
         }
 
         return false;
+    }
+
+    /**
+     * @return \Dominant\Elementary\Response
+     */
+    public function getCoreController(): Response
+    {
+        $return = new Response();
+        try {
+            if (empty($this->controllers)) {
+                throw new notFountException("No defined base controller");
+            } else {
+                $return->responseData = $this->controllers[ 0 ];
+                $return->status = true;
+            }
+
+        }
+        catch (notFountException $e) {
+            $return->assertion = $e;
+        }
+
+        return $return;
     }
 
 }

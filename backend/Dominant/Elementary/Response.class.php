@@ -11,13 +11,17 @@ use exceptions\notImplementedException;
 class Response implements JsonIntegrated {
     public $status = false;
 
+    /** @var mixed */
     public $responseData = [];
 
     public $assertion = null;
 
-    function __construct()
+    function __construct( $result = DNULL )
     {
-        echo "Hello from response";
+        if ($result !== DNULL) {
+            $this->status = true;
+            $this->responseData = $result;
+        }
     }
 
     /**
