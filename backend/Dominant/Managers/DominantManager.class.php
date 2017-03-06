@@ -8,7 +8,7 @@ namespace Dominant\Managers;
  */
 abstract class DominantManager
 {
-    private static $instances;
+    protected static $instances;
 
     protected function __construct()
     {
@@ -22,7 +22,7 @@ abstract class DominantManager
     /**
      * @return mixed
      */
-    protected static function getInstance()
+    public static function getInstance()
     {
         $type = get_called_class();
         if (!isset(self::$instances[ $type ])) {

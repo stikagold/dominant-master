@@ -2,3 +2,5 @@
 .idea/
 backend/composer.lock
 backend/vendor
+backend/config
+public/caprice.local/global

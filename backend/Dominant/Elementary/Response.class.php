@@ -14,6 +14,7 @@ class Response implements JsonIntegrated {
     /** @var mixed */
     public $responseData = [];
 
+    /** @var null | \Exception */
     public $assertion = null;
 
     function __construct( $result = DNULL )

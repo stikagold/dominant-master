@@ -10,5 +10,7 @@ namespace exceptions;
 
 class notFountException extends dominantException
 {
+    const NOT_FOUND_SUBJECT = 50;
+    const NOT_FOUND_AREA    = 51;
 
 }

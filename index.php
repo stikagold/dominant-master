@@ -3,28 +3,57 @@ ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
 
-require_once("init.php");
-
-use Dominant\Elementary\UrlParser;
+require_once( "init.php" );
 
 try {
-    echo "<pre>";
-    $url = new UrlParser();
-    $controller = $url->getCoreController();
-    if($controller->status){
-        switch ($controller->responseData) {
-            case "account":
-                require_once(PACKAGES_DIR."index.php");
-                break;
-            default:
-                echo "No defined anything";
-                break;
-        }
+    $url = new \Dominant\Elementary\UrlParser();
+    $controllerManager = \Dominant\Managers\ControllerManager::getInstance();
+    $controllerRes = $controllerManager->getController($url);
+    if (!$controllerRes->status) {
+        throw $controllerRes->assertion;
     }
-    $db = new MysqliDb("localhost", "root", "Gizma85451605", "mykruto_ru");
-    $admins = $db->get("adm_users");
-    var_dump($admins);
-//    var_dump($controller->getAsArray());
-}catch (dominantException $e){
+    /** @var \Controllers\caprice\homeController $currentController */
+    $currentController = $controllerRes->responseData;
+    ?>
+    <!DOCTYPE html>
+    <!--[if IE 8]>
+    <html class="ie8" lang="en"><![endif]-->
+    <!--[if IE 9]>
+    <html class="ie9" lang="en"><![endif]-->
+    <!--[if !IE]><!-->
+    <html lang="en">
+    <!--<![endif]-->
+    <!-- start: HEAD -->
+    <head>
+        <?php
+        $currentController->loadLocalCSS();
+        ?>
+    </head>
+    <body>
+    <div id="app">
+    <?php
+    $currentController->loadPage("header");
+    $currentController->loadPage("content");
+    $currentController->loadPage("footer");
+    ?>
+    </div>
+    <?php
+    $currentController->loadLocalJS();
+    ?>
+    <script>
+        jQuery(document).ready(function () {
+            Main.init();
+            Index.init();
+        });
+    </script>
+
+    </body>
+
+    </html>
+    <?php
+}
+catch (\exceptions\dominantException $e) {
+    echo "<pre>";
     echo "Catched error<br>", $e->getMessage();
+    var_dump($e);
 }
